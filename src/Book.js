@@ -1,15 +1,14 @@
 import React, {Component} from 'react'
 //import { Route } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
+import { default as Shelf }from './Shelf'
 import './App.css'
 import PropTypes from 'prop-types'
 
 class Book extends Component{
     static propTypes = {
-        title: PropTypes.string.isRequired,
-        authors: PropTypes.string.isRequired,
-        cover: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired
+        book: PropTypes.object.isRequired,
+        onShelfChange: PropTypes.func
     }
     componentDidMount() {
        /* BooksAPI.get(this.props.id).then((book) => {
@@ -20,14 +19,16 @@ class Book extends Component{
         })*/
     }
     render() {
+        const {  book, onShelfChange } = this.props ;
         return (
             <div className="book">
                 <div className="book-top">
                     <div className="book-cover" style={{
                         width: 128, height: 193,
-                        backgroundImage: `url(${this.props.cover})` }}></div>
+                        backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
                     <div className="book-shelf-changer">
-                        <select>
+                        <select  onChange={e => onShelfChange(book, e.target.value)}
+                                 value={book.shelf ? book.shelf : ''}>
                             <option value="none" disabled>Move to...</option>
                             <option value="currentlyReading">Currently Reading</option>
                             <option value="wantToRead">Want to Read</option>
@@ -36,8 +37,8 @@ class Book extends Component{
                         </select>
                     </div>
                 </div>
-                <div className="book-title">{this.props.title}</div>
-                <div className="book-authors">{this.props.authors}</div>
+                <div className="book-title">{book.title}</div>
+                <div className="book-authors">{book.authors ? book.authors.join(',') : null}</div>
             </div>
         )
     }

@@ -15,8 +15,23 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     books: [],
-    showSearchPage: false
+    showSearchPage: false,
+      shelfs : [
+
+          {
+              query: 'currentlyReading',
+              title: 'Currently Reading'
+          },{
+              query: 'wantToRead',
+              title: 'Want to Read'
+          },{
+              query: 'read',
+              title: 'Read'
+          }
+
+      ]
   }
+
     componentDidMount() {
         BooksAPI.getAll().then((books) => {
           this.setState({books : books})
@@ -25,11 +40,34 @@ class BooksApp extends React.Component {
             this.setState({ contacts })
         })*/
     }
+    alterShelf = (book) => {
+      this.setState( (book) => ({
+
+          })
+      )
+    }
+    onShelfChange = (book, shelf) => {
+        console.log('app.onShelfChange', shelf);
+        const id = book.id
+        const currentBooks = [...this.state.books]
+        const indexToUpdate = currentBooks.findIndex(book => book.id === id)
+        const newBookToUpdate = Object.assign({}, currentBooks[indexToUpdate], {
+            shelf: shelf
+        });
+
+        this.setState({
+            books: [...currentBooks.slice(0, indexToUpdate), newBookToUpdate,
+                ...currentBooks.slice(indexToUpdate + 1)]
+        })
+
+        BooksAPI.update(book, shelf)
+    }
+
   render() {
     const books = this.state.books;
     return (
       <div className="app">
-        <Route path='/book' render={() =>
+        <Route exact path='/book' render={() =>
             <Book id='1' authors='a' cover='http://books.google.com/books/content?id=yDtCuFHXbAYC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE72RRiTR6U5OUg3IY_LpHTL2NztVWAuZYNFE8dUuC0VlYabeyegLzpAnDPeWxE6RHi0C2ehrR9Gv20LH2dtjpbcUcs8YnH5VCCAH0Y2ICaKOTvrZTCObQbsfp4UbDqQyGISCZfGN&source=gbs_api' title='c'
             />
         } />
@@ -40,12 +78,12 @@ class BooksApp extends React.Component {
               </div>
               <div className="list-books-content">
                 <div>
-                  <Shelf books={books} query='currentlyReading' title='Currently Reading'/>
-                  <Shelf books={books} query='wantToRead' title='Want to Read'/>
-                  <Shelf books={books} query='read' title='Read'/>
-
-
-
+                    {this.state.shelfs.map((shelf, index) => (
+                        <Shelf key={index}
+                               books={books.filter(livros => (livros.shelf === shelf.query))}
+                               onShelfChange={this.onShelfChange}
+                               title={shelf.title}/>
+                    ))}
                 </div>
               </div>
               <div className="open-search">
