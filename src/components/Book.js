@@ -1,38 +1,35 @@
 import React, {Component} from 'react'
 //import { Route } from 'react-router-dom'
-import * as BooksAPI from './BooksAPI'
+import * as BooksAPI from '../BooksAPI'
 import { default as Shelf }from './Shelf'
-import './App.css'
+import '../App.css'
 import PropTypes from 'prop-types'
 
 class Book extends Component{
     static propTypes = {
         book: PropTypes.object.isRequired,
+        shelfs: PropTypes.array.isRequired,
         onShelfChange: PropTypes.func
     }
-    componentDidMount() {
-       /* BooksAPI.get(this.props.id).then((book) => {
-
-        })*/
-        /*ContactsAPI.getAll().then((contacts) => {
-            this.setState({ contacts })
-        })*/
-    }
+    componentDidMount() {}
     render() {
-        const {  book, onShelfChange } = this.props ;
+        const {  book, onShelfChange, shelfs } = this.props ;
+        const noThumbLink = "https://books.google.com/googlebooks/images/no_cover_thumb.gif";
+
         return (
             <div className="book">
                 <div className="book-top">
                     <div className="book-cover" style={{
                         width: 128, height: 193,
-                        backgroundImage: `url(${book.imageLinks.thumbnail})` }}></div>
+                        backgroundImage: `url(${book.imageLinks ? book.imageLinks.thumbnail : noThumbLink}` }}></div>
                     <div className="book-shelf-changer">
                         <select  onChange={e => onShelfChange(book, e.target.value)}
                                  value={book.shelf ? book.shelf : ''}>
                             <option value="none" disabled>Move to...</option>
-                            <option value="currentlyReading">Currently Reading</option>
-                            <option value="wantToRead">Want to Read</option>
-                            <option value="read">Read</option>
+                            { shelfs.map((shelf, index)=> (
+                                <option value={shelf.query} key={index}>{shelf.title}</option>
+                            )
+                            )}
                             <option value="none">None</option>
                         </select>
                     </div>

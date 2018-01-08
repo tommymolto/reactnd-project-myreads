@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 //import { Route } from 'react-router-dom'
-import * as BooksAPI from './BooksAPI'
-import './App.css'
+import * as BooksAPI from '../BooksAPI'
+import '../App.css'
 import { default as Book } from './Book'
 import PropTypes from 'prop-types'
 
@@ -9,6 +9,7 @@ class Shelf extends Component{
     static propTypes = {
         books: PropTypes.array.isRequired,
         title: PropTypes.string.isRequired,
+        shelfs: PropTypes.array.isRequired,
         onShelfChange: PropTypes.func
     }
     state = {
@@ -22,6 +23,7 @@ class Shelf extends Component{
 
     render() {
         const books = this.state.books
+        const shelfs=this.props.shelfs
         const onShelfChange = this.props.onShelfChange
         return (
             <div className="bookshelf">
@@ -34,6 +36,7 @@ class Shelf extends Component{
                                 <li  key={index} >
                                     <Book key={index}
                                           book={livro}
+                                          shelfs={shelfs}
                                           onShelfChange={onShelfChange}
                                     />
                                 </li>
