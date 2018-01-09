@@ -9,7 +9,8 @@ import { css } from 'glamor';
 
 class Search extends Component{
     static propTypes = {
-        shelfs: PropTypes.array.isRequired
+        shelfs: PropTypes.array.isRequired,
+        onShelfChange : PropTypes.func.isRequired
     }
     state = {
         books: [],
@@ -42,37 +43,11 @@ class Search extends Component{
         }
     }
 
-    onShelfChange = (book, shelf) => {
-        console.log(shelf);
-        const newBooks = [];
-        BooksAPI.update(book, shelf)
-            .then(books => {
-                Object.keys(books)
-                    .forEach(shelf => {
-                        return books[shelf].map(id => ({ id: id, shelf: shelf}))
-                            .forEach(book => {
-                                newBooks.push(book)
-                            })
-                    })
-                return newBooks
-            })
-            .then(newBooks => {
-                this.setState({ currentBooks: newBooks })
-            }).then(() => {
-                const success = this.props.shelfs.filter( v => v.query === shelf);
-                toast("Book "+ book.title +"  added to shelf "+ success[0].title, {
-                    position: toast.POSITION.BOTTOM_RIGHT,
-                    className: css({
-                        background: "black"
-                    })
-                });
-            }
-        )
-    }
+
 
     render() {
         const { books, currentBooks } = this.state;
-        const shelfs = this.props.shelfs;
+        const {shelfs, onShelfChange} = this.props;
         let booksList
 
         if (books.length > 0) {
@@ -87,7 +62,7 @@ class Search extends Component{
                     <li key={index}>
                         <Book
                             key={index}
-                            onShelfChange={this.onShelfChange}
+                            onShelfChange={onShelfChange}
                             book={book}
                             shelfs={shelfs} />
                     </li>

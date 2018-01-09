@@ -5,7 +5,8 @@ import { default as Book } from './components/Book'
 import { default as Shelf} from './components/Shelf'
 import { default as Search} from './components/Search'
 import './App.css'
-
+import { ToastContainer, toast } from 'react-toastify';
+import { css } from 'glamor';
 class BooksApp extends React.Component {
 
   state = {
@@ -40,20 +41,43 @@ class BooksApp extends React.Component {
     }
 
     onShelfChange = (book, shelf) => {
+
         console.log('app.onShelfChange', shelf);
         const id = book.id
         const currentBooks = [...this.state.books]
         const indexToUpdate = currentBooks.findIndex(book => book.id === id)
-        const newBookToUpdate = Object.assign({}, currentBooks[indexToUpdate], {
+        const newBookToUpdate = Object.assign({}, book, {
             shelf: shelf
         });
+        console.log(newBookToUpdate);
 
-        this.setState({
-            books: [...currentBooks.slice(0, indexToUpdate), newBookToUpdate,
-                ...currentBooks.slice(indexToUpdate + 1)]
-        })
 
-        BooksAPI.update(book, shelf)
+        /*2 conditions to update state*/
+
+        /* 1 - Book already exists,only updating the shelf*/
+        if(indexToUpdate >=0) {
+            this.setState({
+                books: [...currentBooks.slice(0, indexToUpdate), newBookToUpdate,
+                    ...currentBooks.slice(indexToUpdate + 1)]
+            })
+        }else{
+        /* 2 - New Book, enter in the flow */
+            this.setState({
+                books: [...currentBooks, newBookToUpdate,
+                    ]
+            })
+        }
+
+
+        BooksAPI.update(book, shelf).then(() => {
+                const success = this.state.shelfs.filter( v => v.query === shelf);
+                toast("Book "+ book.title +"  added to shelf "+ success[0].title, {
+                    position: toast.POSITION.BOTTOM_RIGHT,
+                    className: css({
+                        background: "black"
+                    })
+                });
+            })
     }
 
   render() {
@@ -89,8 +113,9 @@ class BooksApp extends React.Component {
             </div>
         )} />
           <Route path='/search' render={() =>
-            <Search shelfs={shelfs} />
+            <Search shelfs={shelfs} onShelfChange={this.onShelfChange}/>
           }/>
+          <ToastContainer autoClose={8000} />
       </div>
     )
   }
